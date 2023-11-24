@@ -72,4 +72,18 @@ body {
     color: #333;
   }
 
+  .cell:hover {
+    background-color: #ffcc66; /* Default hover color */
+  }
 
+  .start-hover:hover {
+    background-color: #32b826 !important; /* Hover color for start point */
+  }
+
+  .end-hover:hover {
+    background-color: #e93030 !important; /* Hover color for end point */
+  }
+
+  p {
+    color: #fff;
+  }
