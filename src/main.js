@@ -1,63 +1,111 @@
-class Chessboard {
-    constructor() {
-      this.size = 8;
-      this.board = Array.from({ length: this.size }, () =>
-        Array(this.size).fill(0)
-      );
-    }
-  
-    isValidMove(x, y) {
-      return x >= 0 && x < this.size && y >= 0 && y < this.size;
-    }
-  
-    getNeighbors(x, y) {
-      const possibleMoves = [
-        [x + 1, y + 2],
-        [x + 2, y + 1],
-        [x + 2, y - 1],
-        [x + 1, y - 2],
-        [x - 1, y - 2],
-        [x - 2, y - 1],
-        [x - 2, y + 1],
-        [x - 1, y + 2],
-      ];
-  
-      return possibleMoves.filter(([i, j]) => this.isValidMove(i, j));
-    }
-  }
-  
-  function knightTravails(start, end) {
-    const chessboard = new Chessboard();
-    const queue = [[start, [start]]];
-  
+document.addEventListener("DOMContentLoaded", () => {
+  const chessboard = document.getElementById("chessboard");
+  const startBtn = document.getElementById("startBtn");
+  const endBtn = document.getElementById("endBtn");
+  const clearBtn = document.getElementById("clearBtn");
+  const output = document.getElementById("output");
+
+  let startCell = null;
+  let endCell = null;
+
+  const knightMoves = [
+    [-2, -1], [-2, 1], [-1, -2], [-1, 2],
+    [1, -2], [1, 2], [2, -1], [2, 1]
+  ];
+
+  const markPath = (path) => {
+    path.forEach(({ row, col }, index) => {
+      const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+      cell.classList.add("path");
+      const moveNumber = document.createElement("div");
+      moveNumber.textContent = index;
+      moveNumber.classList.add("move-number");
+      cell.appendChild(moveNumber);
+    });
+  };
+
+  const findShortestPath = (start, end) => {
+    const queue = [{ path: [start], visited: new Set([`${start.row},${start.col}`]) }];
+
     while (queue.length > 0) {
-      const [current, path] = queue.shift();
-  
-      if (JSON.stringify(current) === JSON.stringify(end)) {
-        return path;
+      const { path, visited } = queue.shift();
+      const current = path[path.length - 1];
+
+      if (current.row === end.row && current.col === end.col) {
+        markPath(path);
+        return;
       }
-  
-      for (const neighbor of chessboard.getNeighbors(...current)) {
-        const [i, j] = neighbor;
-        if (chessboard.board[i][j] === 0) {
-          chessboard.board[i][j] = 1;
-          queue.push([neighbor, [...path, neighbor]]);
+
+      for (const [rowDiff, colDiff] of knightMoves) {
+        const nextRow = current.row + rowDiff;
+        const nextCol = current.col + colDiff;
+
+        if (nextRow >= 0 && nextRow < 8 && nextCol >= 0 && nextCol < 8) {
+          const newPosition = `${nextRow},${nextCol}`;
+          if (!visited.has(newPosition)) {
+            const newPath = [...path, { row: nextRow, col: nextCol }];
+            const newVisited = new Set(visited);
+            newVisited.add(newPosition);
+            queue.push({ path: newPath, visited: newVisited });
+          }
         }
       }
     }
-  
-    return null;
+  };
+
+  startBtn.addEventListener("click", () => {
+    output.textContent = "";
+    startCell = null;
+    clear();
+  });
+
+  endBtn.addEventListener("click", () => {
+    output.textContent = "";
+    endCell = null;
+  });
+
+
+  function clear (){
+    output.textContent = "";
+    const pathCells = document.querySelectorAll(".path");
+    pathCells.forEach(cell => cell.classList.remove("path"));
+    const moveNumbers = document.querySelectorAll(".move-number");
+    moveNumbers.forEach(number => number.remove());
+    startCell = null;
+    endCell = null;
+  };
+
+  clearBtn.addEventListener("click", () => {
+    clear();
+  });
+
+  chessboard.addEventListener("click", (event) => {
+    const clickedCell = event.target;
+    if (clickedCell.classList.contains("cell")) {
+      const clickedRow = parseInt(clickedCell.dataset.row);
+      const clickedCol = parseInt(clickedCell.dataset.col);
+
+      if (startCell === null) {
+        startCell = { row: clickedRow, col: clickedCol };
+        output.textContent = `Start position set to (${startCell.row}, ${startCell.col})`;
+      } else if (endCell === null) {
+        endCell = { row: clickedRow, col: clickedCol };
+        output.textContent = `End position set to (${endCell.row}, ${endCell.col})`;
+        findShortestPath(startCell, endCell);
+      }
+    }
+  });
+
+   
+
+  // Create the chessboard
+  for (let row = 0; row < 8; row++) {
+    for (let col = 0; col < 8; col++) {
+      const cell = document.createElement("div");
+      cell.classList.add("cell", (row + col) % 2 === 0 ? "even" : "odd");
+      cell.dataset.row = row;
+      cell.dataset.col = col;
+      chessboard.appendChild(cell);
+    }
   }
-  
-  // Example usage:
-  const startPosition = [0, 0];
-  const endPosition = [7, 7];
-  const result = knightTravails(startPosition, endPosition);
-  
-  if (result) {
-    console.log(`Shortest path from ${startPosition} to ${endPosition}:`);
-    console.log(result);
-  } else {
-    console.log("No valid path found.");
-  }
-  
+});
