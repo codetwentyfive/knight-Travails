@@ -13,12 +13,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const markPath = (path) => {
     path.forEach(({ row, col }, index) => {
-      const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
-      cell.classList.add("path");
-      const moveNumber = document.createElement("div");
-      moveNumber.textContent = index;
-      moveNumber.classList.add("move-number");
-      cell.appendChild(moveNumber);
+      // Skip marking start and end points in the path
+      if (!(row === startCell.row && col === startCell.col) && !(row === endCell.row && col === endCell.col)) {
+        const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+        cell.classList.add("path");
+        const moveNumber = document.createElement("div");
+        moveNumber.textContent = index;
+        moveNumber.classList.add("move-number");
+        cell.appendChild(moveNumber);
+        
+      } else if ((row === endCell.row && col === endCell.col)){
+        const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+        cell.classList.add("end-point");
+        const moveNumber = document.createElement("div");
+        moveNumber.textContent = index;
+        moveNumber.classList.add("move-number");
+        cell.appendChild(moveNumber);
+      }
     });
   };
 
@@ -61,20 +72,20 @@ document.addEventListener("DOMContentLoaded", () => {
     endCell = null;
   };
 
-  const updateHoverStyles = () => {
-    const cells = document.querySelectorAll(".cell");
-    cells.forEach(cell => cell.classList.remove("start-hover", "end-hover"));
+const updateHoverStyles = () => {
+  const cells = document.querySelectorAll(".cell");
+  cells.forEach(cell => cell.classList.remove("start-hover", "end-hover", "hover", "start-point", "end-point"));
 
-    if (startCell !== null) {
-      const startCellElement = document.querySelector(`.cell[data-row="${startCell.row}"][data-col="${startCell.col}"]`);
-      startCellElement.classList.add("start-hover");
-    }
+  if (startCell !== null) {
+    const startCellElement = document.querySelector(`.cell[data-row="${startCell.row}"][data-col="${startCell.col}"]`);
+    startCellElement.classList.add("start-hover", "start-point");
+  }
 
-    if (endCell !== null) {
-      const endCellElement = document.querySelector(`.cell[data-row="${endCell.row}"][data-col="${endCell.col}"]`);
-      endCellElement.classList.add("end-hover");
-    }
-  };
+  if (endCell !== null) {
+    const endCellElement = document.querySelector(`.cell[data-row="${endCell.row}"][data-col="${endCell.col}"]`);
+    endCellElement.classList.add("end-hover", "end-point");
+  }
+};
 
   clearBtn.addEventListener("click", () => {
     clearBoard();
