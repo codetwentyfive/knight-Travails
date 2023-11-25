@@ -84,6 +84,25 @@ body {
     background-color: #e93030 !important; /* Hover color for end point */
   }
 
+
+  .start-point {
+    background-color: #66ff66; /* Green for start point */
+  }
+
+  .end-point {
+    background-color: #ff6666; /* Red for end point */
+  }
+
+  .path {
+    background-color: #ffcc66; /* Color for cells in the path */
+  }
+
+  .move-number {
+    color: white; /* Text color for move numbers */
+    font-size: 14px;
+    font-weight: bold;
+  }
+
   p {
     color: #fff;
   }
